@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "currentVersion": "1.0.0",
+  "latestVersion": "1.0.0",
+  "forceUpdate": false,
+  "updateTitle": "Update Available",
+  "updateMessage": "A new version of UB Launcher is available. Update now to get the latest features, improvements, and bug fixes.",
+  "updateUrl": "",
+  "releaseNotesUrl": "",
+  "assets": {},
+  "partnerServers": []
+}

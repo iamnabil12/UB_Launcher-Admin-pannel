@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UB Launcher Control Center</title>
+  <style>
+    :root{color-scheme:dark;--bg:#050a0f;--side:#07121b;--card:#0a1823;--soft:#0d202e;--line:#1c3c50;--text:#eff9ff;--muted:#8eaabd;--cyan:#55d7ff;--blue:#167fc1;--green:#48d99a;--red:#ff747d}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,system-ui,sans-serif}button,input,textarea{font:inherit}
+    .shell{min-height:100vh;display:grid;grid-template-columns:238px 1fr}.sidebar{position:sticky;top:0;height:100vh;padding:26px 17px;background:linear-gradient(180deg,#091b29,var(--side));border-right:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:11px;padding:5px 9px 26px}.logo{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#05bfee,#1266bd);font-weight:900}.brand strong{display:block;font-size:16px}.brand span{font-size:11px;color:var(--muted)}
+    nav{display:grid;gap:6px}.nav{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:1px solid transparent;border-radius:8px;background:transparent;color:#9eb4c2;text-align:left;cursor:pointer}.nav:hover{background:#0d2534;color:white}.nav.active{background:#10324a;border-color:#1c5877;color:var(--cyan)}.nav b{width:20px;text-align:center}
+    .side-note{position:absolute;left:18px;right:18px;bottom:22px;padding:13px;border:1px solid #1b4b3a;border-radius:9px;background:#09241c;color:#6de5ad;font-size:12px}.content{min-width:0;padding:31px 34px 70px;background:radial-gradient(circle at 90% 0,#0c2c42 0,transparent 30%)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:25px}.topbar h1{margin:0 0 5px;font-size:27px}.topbar p,.muted{margin:0;color:var(--muted)}.refresh{border:1px solid #28536d;background:#0b1e2b;color:#cce9f8;border-radius:8px;padding:9px 13px;cursor:pointer}
+    .page{display:none}.page.active{display:block}.stats{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px}.stat,.panel{border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#0c1c28,#08131d);box-shadow:0 15px 36px #0003}.stat{padding:17px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;margin-top:7px;font-size:25px}.stat em{font-size:11px;color:#63dca4;font-style:normal}
+    .columns{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:14px}.panel{padding:21px;margin-bottom:14px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:17px}.panel h2{margin:0 0 5px;font-size:18px}.panel p{margin:0;color:var(--muted);line-height:1.5}
+    label{display:block;margin:14px 0 6px;font-weight:650;color:#d8eaf4}input,textarea{width:100%;padding:10px 11px;border:1px solid #2b5067;border-radius:7px;outline:0;background:#06121b;color:white}input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #32bdeb22}textarea{min-height:88px;resize:vertical}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.check{display:flex;align-items:center;gap:9px}.check input{width:auto}.help{margin-top:8px;color:#7291a5;font-size:12px}
+    .primary,.danger,.secondary{padding:10px 16px;border-radius:7px;font-weight:750;cursor:pointer}.primary{border:1px solid #51c9f8;background:var(--blue);color:white}.secondary{border:1px solid #31536a;background:#0a1b27;color:#cce2ef}.danger{border:1px solid #713844;background:#2c1219;color:#ff9da4}.primary:disabled{opacity:.55;cursor:wait}.savebar{position:sticky;bottom:15px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 15px;border:1px solid #25506a;border-radius:11px;background:#081722ee;backdrop-filter:blur(12px)}#message{color:#9cc6dd}#message.error{color:#ff969e}
+    .assets{display:grid;grid-template-columns:repeat(2,minmax(250px,1fr));gap:12px}.asset,.partner{padding:15px;border:1px solid #18384b;border-radius:9px;background:#07141e}.asset label{margin:0 0 8px}.asset input[type=file]{margin-top:8px;padding:7px;color:var(--muted)}.preview{display:none;width:100%;height:78px;margin-top:9px;object-fit:contain;border-radius:6px;background:#03090e}
+    .partner{margin-bottom:11px}.partner-title{display:flex;justify-content:space-between;align-items:center}.partner-title strong{font-size:15px}.partner-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.partner .check{margin-top:16px}.empty{padding:32px;text-align:center;border:1px dashed #2a4b60;border-radius:10px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse}th{text-align:left;padding:10px;border-bottom:1px solid #284454;color:#86a8bb;font-size:11px;text-transform:uppercase}td{padding:11px 10px;border-bottom:1px solid #142d3c;color:#d8e8f1;white-space:nowrap}.table-wrap{overflow:auto}.pill{display:inline-block;padding:4px 7px;border-radius:99px;background:#102f43;color:#70d8ff;font-size:11px}.online{color:#61e5a8}.versions{display:grid;gap:9px}.version-row{display:grid;grid-template-columns:90px 1fr 35px;gap:9px;align-items:center}.bar{height:7px;border-radius:9px;background:#173244;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#1582c6,#4bd4f3)}.search{max-width:280px}
+    @media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}}@media(max-width:760px){.shell{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.side-note{display:none}.content{padding:22px 16px}.form-grid,.partner-grid,.assets{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">UB</div><div><strong>Control Center</strong><span>Launcher administration</span></div></div>
+    <nav>
+      <button class="nav active" data-page="overview"><b>⌂</b>Overview</button>
+      <button class="nav" data-page="updates"><b>↑</b>Launcher update</button>
+      <button class="nav" data-page="partners"><b>◈</b>Partner servers</button>
+      <button class="nav" data-page="branding"><b>◇</b>Branding assets</button>
+      <button class="nav" data-page="users"><b>◎</b>User base</button>
+    </nav>
+    <div class="side-note">● API service online</div>
+  </aside>
+
+  <main class="content">
+    <div class="topbar"><div><h1 id="pageTitle">Overview</h1><p id="pageSubtitle">Launcher health and user activity at a glance.</p></div><button class="refresh" id="refreshButton">↻ Refresh</button></div>
+
+    <section class="page active" id="overviewPage">
+      <div class="stats">
+        <div class="stat"><span>Total users</span><strong id="totalUsers">0</strong><em>Opted-in installs</em></div>
+        <div class="stat"><span>Online now</span><strong id="onlineNow">0</strong><em>Last 10 minutes</em></div>
+        <div class="stat"><span>Active today</span><strong id="active24h">0</strong><em>Last 24 hours</em></div>
+        <div class="stat"><span>Active this week</span><strong id="active7d">0</strong><em>Last 7 days</em></div>
+        <div class="stat"><span>Launcher sessions</span><strong id="totalSessions">0</strong><em>All time</em></div>
+        <div class="stat"><span>Game launches</span><strong id="totalGameLaunches">0</strong><em>All time</em></div>
+      </div>
+      <div class="columns">
+        <div class="panel"><div class="panel-head"><div><h2>Recent users</h2><p>Latest opted-in launcher activity.</p></div></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Version</th><th>OS</th><th>Last seen</th></tr></thead><tbody id="recentUsers"></tbody></table></div></div>
+        <div class="panel"><div class="panel-head"><div><h2>Version distribution</h2><p>Installed launcher versions.</p></div></div><div class="versions" id="versionChart"></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="updatesPage">
+      <div class="panel"><div class="panel-head"><div><h2>Update popup</h2><p>Control which versions receive optional or mandatory update notices.</p></div></div>
+        <div class="form-grid"><div><label for="currentVersion">Current version</label><input id="currentVersion" placeholder="1.1.0"></div><div><label for="latestVersion">Latest version</label><input id="latestVersion" placeholder="1.2.0"></div></div>
+        <label for="updateTitle">Popup title</label><input id="updateTitle" maxlength="120">
+        <label for="updateMessage">Popup message</label><textarea id="updateMessage" maxlength="500"></textarea>
+        <label for="updateUrl">Update/download page (HTTPS)</label><input id="updateUrl" type="url" placeholder="https://launcher.unitedbangla.top/download">
+        <label for="releaseNotesUrl">What's New / release notes page (HTTPS)</label><input id="releaseNotesUrl" type="url" placeholder="https://launcher.unitedbangla.top/releases/1.2.0">
+        <label class="check"><input id="forceUpdate" type="checkbox">Force update—hide the Later button below minimum version</label>
+        <div class="help">Safety: force update cannot be enabled without a valid HTTPS update URL.</div>
+      </div>
+    </section>
+
+    <section class="page" id="partnersPage">
+      <div class="panel"><div class="panel-head"><div><h2>Partner servers</h2><p>Add Minecraft servers that will appear inside UB Launcher.</p></div><button class="primary" id="addPartnerButton">+ Add server</button></div><div id="partnerList"></div></div>
+    </section>
+
+    <section class="page" id="brandingPage">
+      <div class="panel"><div class="panel-head"><div><h2>Launcher branding</h2><p>Upload images and SVG icons. Uploaded files activate only after Publish.</p></div></div><div class="assets" id="assets"></div></div>
+    </section>
+
+    <section class="page" id="usersPage">
+      <div class="panel"><div class="panel-head"><div><h2>User base monitor</h2><p>Only users who enable anonymous telemetry are listed. Email stays unavailable until real account authentication exists.</p></div><input class="search" id="userSearch" placeholder="Search ID, version, OS…"></div>
+        <div class="table-wrap"><table><thead><tr><th>Install/User</th><th>Account</th><th>Email</th><th>Version</th><th>OS / Arch</th><th>Locale</th><th>Last event</th><th>Sessions</th><th>Launches</th><th>First seen</th><th>Last seen</th></tr></thead><tbody id="allUsers"></tbody></table></div>
+      </div>
+    </section>
+
+    <div class="savebar"><div id="message">Loading configuration…</div><button class="primary" id="publishButton">Publish launcher changes</button></div>
+  </main>
+</div>
+
+<script>
+if(new URL(location.href).username)history.replaceState(null,'',`${location.protocol}//${location.host}${location.pathname}`);
+const pageInfo={overview:['Overview','Launcher health and user activity at a glance.'],updates:['Launcher update','Publish fixes and require outdated versions to update.'],partners:['Partner servers','Manage servers promoted inside UB Launcher.'],branding:['Branding assets','Change banners, logos, and launcher SVG icons.'],users:['User base','Monitor privacy-safe, opted-in launcher activity.']};
+const assetFields=[['heroBanner','Home banner','image/png,image/jpeg,image/webp'],['discordBanner','Discord banner','image/png,image/jpeg,image/webp'],['logo','UB logo','image/png,image/jpeg,image/webp'],['homeIcon','Home icon','.svg'],['instanceIcon','Instance icon','.svg'],['modsIcon','Content icon','.svg'],['customizeIcon','Customize icon','.svg'],['performanceIcon','Performance icon','.svg'],['serverIcon','Create server icon','.svg'],['settingsIcon','Settings icon','.svg'],['discordIcon','Discord icon','.svg'],['tiktokIcon','TikTok icon','.svg'],['youtubeIcon','YouTube icon','.svg'],['webIcon','Website icon','.svg']];
+let config={assets:{},partnerServers:[]};let analytics={summary:{},versions:[],users:[]};
+const $=selector=>document.querySelector(selector);const message=$('#message');const publishButton=$('#publishButton');
+
+for(const button of document.querySelectorAll('.nav'))button.onclick=()=>showPage(button.dataset.page);
+$('#refreshButton').onclick=loadAll;$('#publishButton').onclick=publishConfig;$('#addPartnerButton').onclick=()=>{config.partnerServers.push(newPartner());renderPartners()};$('#userSearch').oninput=renderAllUsers;
+
+$('#assets').innerHTML=assetFields.map(([key,label,accept])=>`<div class="asset"><label>${escapeHtml(label)}</label><input id="${key}" data-asset="${key}" type="url" placeholder="HTTPS asset URL"><input data-upload="${key}" type="file" accept="${accept}"><img id="${key}Preview" class="preview" alt="Preview"></div>`).join('');
+for(const input of document.querySelectorAll('[data-upload]'))input.onchange=()=>uploadAsset(input);
+
+loadAll();
+
+async function loadAll(){setMessage('Refreshing dashboard…');try{const [configResponse,analyticsResponse]=await Promise.all([fetch(apiUrl('/admin/config'),{cache:'no-store'}),fetch(apiUrl('/admin/analytics'),{cache:'no-store'})]);if(!configResponse.ok||!analyticsResponse.ok)throw new Error('Could not load dashboard data.');config=await configResponse.json();analytics=await analyticsResponse.json();bindConfig();renderAnalytics();setMessage('Everything is up to date.')}catch(error){setMessage(error.message,true)}}
+function bindConfig(){for(const key of ['currentVersion','latestVersion','updateTitle','updateMessage','updateUrl','releaseNotesUrl'])$('#'+key).value=config[key]||'';$('#forceUpdate').checked=Boolean(config.forceUpdate);config.partnerServers=Array.isArray(config.partnerServers)?config.partnerServers:[];for(const [key] of assetFields)setAsset(key,config.assets?.[key]||'');renderPartners()}
+
+function showPage(name){for(const button of document.querySelectorAll('.nav'))button.classList.toggle('active',button.dataset.page===name);for(const page of document.querySelectorAll('.page'))page.classList.toggle('active',page.id===name+'Page');$('#pageTitle').textContent=pageInfo[name][0];$('#pageSubtitle').textContent=pageInfo[name][1]}
+
+function renderPartners(){const host=$('#partnerList');if(!config.partnerServers.length){host.innerHTML='<div class="empty">No partner servers yet. Click “Add server” to create one.</div>';return}host.innerHTML=config.partnerServers.map((server,index)=>`<div class="partner" data-partner="${index}"><div class="partner-title"><strong>${escapeHtml(server.name||'New partner server')}</strong><button class="danger" data-remove="${index}">Remove</button></div><div class="partner-grid"><div><label>Server name</label><input data-field="name" value="${attribute(server.name)}" placeholder="United Bangla SMP"></div><div><label>Server address</label><input data-field="address" value="${attribute(server.address)}" placeholder="play.example.com:25565"></div><div><label>Minecraft version</label><input data-field="version" value="${attribute(server.version)}" placeholder="1.8–1.21"></div><div><label>Badge</label><input data-field="badge" value="${attribute(server.badge)}" placeholder="OFFICIAL / PARTNER"></div><div><label>Icon URL (HTTPS)</label><input data-field="iconUrl" value="${attribute(server.iconUrl)}"></div><div><label>Website URL (HTTPS)</label><input data-field="websiteUrl" value="${attribute(server.websiteUrl)}"></div></div><label>Description</label><textarea data-field="description">${escapeHtml(server.description||'')}</textarea><label class="check"><input data-field="enabled" type="checkbox" ${server.enabled!==false?'checked':''}>Visible in launcher</label></div>`).join('');for(const card of host.querySelectorAll('[data-partner]')){const index=Number(card.dataset.partner);for(const input of card.querySelectorAll('[data-field]')){input.oninput=()=>{config.partnerServers[index][input.dataset.field]=input.type==='checkbox'?input.checked:input.value;card.querySelector('strong').textContent=config.partnerServers[index].name||'New partner server';};}for(const input of card.querySelectorAll('[data-field][type=checkbox]'))input.onchange=input.oninput;}for(const button of host.querySelectorAll('[data-remove]'))button.onclick=()=>{config.partnerServers.splice(Number(button.dataset.remove),1);renderPartners();};}
+function newPartner(){return{id:'server-'+Date.now(),name:'',address:'',description:'',version:'Any version',badge:'PARTNER',iconUrl:'',websiteUrl:'',enabled:true}}
+
+async function publishConfig(){syncConfig();if(config.forceUpdate&&!config.updateUrl)return setMessage('Force update requires an HTTPS update URL.',true);setBusy(true);setMessage('Publishing changes…');try{const response=await fetch(apiUrl('/admin/config'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(config)});const result=await response.json();if(!response.ok)throw new Error(result.error||'Publish failed.');config=result;bindConfig();setMessage('Published. Launchers will receive these changes on next open.')}catch(error){setMessage(error.message,true)}finally{setBusy(false)}}
+function syncConfig(){for(const key of ['currentVersion','latestVersion','updateTitle','updateMessage','updateUrl','releaseNotesUrl'])config[key]=$('#'+key).value.trim();config.forceUpdate=$('#forceUpdate').checked;config.schemaVersion=1;config.assets={};for(const [key] of assetFields){const value=$('#'+key).value.trim();if(value)config.assets[key]=value}}
+
+async function uploadAsset(input){const file=input.files?.[0];if(!file)return;setBusy(true);setMessage(`Uploading ${file.name}…`);try{const base64=await readAsDataUrl(file);const response=await fetch(apiUrl('/admin/upload'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:file.name,base64})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Upload failed.');setAsset(input.dataset.upload,result.url);setMessage('Upload complete. Press Publish to activate it.')}catch(error){setMessage(error.message,true)}finally{setBusy(false)}}
+function setAsset(key,value){$('#'+key).value=value;const preview=$('#'+key+'Preview');preview.src=value;preview.style.display=value?'block':'none'}
+
+function renderAnalytics(){const summary=analytics.summary||{};for(const key of ['totalUsers','onlineNow','active24h','active7d','totalSessions','totalGameLaunches'])$('#'+key).textContent=Number(summary[key]||0).toLocaleString();const recent=(analytics.users||[]).slice(0,8);$('#recentUsers').innerHTML=recent.length?recent.map(user=>`<tr><td>${userLabel(user)}</td><td><span class="pill">${escapeHtml(user.launcherVersion||'Unknown')}</span></td><td>${escapeHtml(user.os||'Unknown')}</td><td class="online">${relativeTime(user.lastSeen)}</td></tr>`).join(''):'<tr><td colspan="4" class="muted">No opted-in user activity yet.</td></tr>';const highest=Math.max(1,...(analytics.versions||[]).map(item=>item.count));$('#versionChart').innerHTML=(analytics.versions||[]).length?analytics.versions.map(item=>`<div class="version-row"><span>${escapeHtml(item.version)}</span><div class="bar"><i style="width:${item.count/highest*100}%"></i></div><b>${item.count}</b></div>`).join(''):'<div class="empty">No version data yet.</div>';renderAllUsers()}
+function renderAllUsers(){const query=$('#userSearch').value.trim().toLowerCase();const users=(analytics.users||[]).filter(user=>JSON.stringify(user).toLowerCase().includes(query));$('#allUsers').innerHTML=users.length?users.map(user=>`<tr><td>${userLabel(user)}<br><span class="muted">${escapeHtml(shortId(user.installId))}</span></td><td>${escapeHtml(user.accountType||'Anonymous')}</td><td>${escapeHtml(user.email||'Not available')}</td><td><span class="pill">${escapeHtml(user.launcherVersion||'Unknown')}</span></td><td>${escapeHtml(user.os||'Unknown')} / ${escapeHtml(user.architecture||'')}</td><td>${escapeHtml(user.locale||'Unknown')}</td><td>${escapeHtml(user.lastEvent||'—')}</td><td>${Number(user.sessions||0)}</td><td>${Number(user.gameLaunches||0)}</td><td>${formatDate(user.firstSeen)}</td><td class="online">${relativeTime(user.lastSeen)}</td></tr>`).join(''):'<tr><td colspan="11" class="muted">No matching opted-in users.</td></tr>'}
+function userLabel(user){return escapeHtml(user.displayName||'Anonymous user')}function shortId(value){const text=String(value||'');return text.length>13?text.slice(0,8)+'…'+text.slice(-4):text}function relativeTime(value){const seconds=Math.max(0,(Date.now()-Date.parse(value))/1000);if(seconds<60)return'Just now';if(seconds<3600)return Math.floor(seconds/60)+'m ago';if(seconds<86400)return Math.floor(seconds/3600)+'h ago';return Math.floor(seconds/86400)+'d ago'}function formatDate(value){const date=new Date(value);return Number.isNaN(date.valueOf())?'—':date.toLocaleDateString()}
+function apiUrl(path){return new URL(path,location.origin).href}function readAsDataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read the file.'));reader.readAsDataURL(file)})}function setBusy(value){publishButton.disabled=value}function setMessage(value,error=false){message.textContent=value;message.classList.toggle('error',error)}function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}function attribute(value){return escapeHtml(value)}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+[Unit]
+Description=UB Launcher Admin Panel
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/ub-launcher-admin
+EnvironmentFile=%h/ub-launcher-admin/.env
+ExecStart=/usr/bin/node %h/ub-launcher-admin/server.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

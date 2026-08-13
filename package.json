@@ -1,0 +1,15 @@
+{
+  "name": "ub-launcher-admin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Remote update and branding control panel for UB Launcher",
+  "scripts": {
+    "start": "node --env-file=.env server.mjs",
+    "check": "node --check server.mjs",
+    "test": "node --test test/server.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
