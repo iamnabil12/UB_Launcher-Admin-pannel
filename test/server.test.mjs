@@ -246,9 +246,41 @@ test('serves public config and protects admin writes', async () => {
     assert.equal(removeAdministratorResponse.status, 200);
     assert.equal((await removeAdministratorResponse.json()).administrators.length, 1);
 
+    const wrongCurrentPasswordResponse = await fetch(`${origin}/admin/change-password`, {
+      method: 'POST',
+      headers: { Authorization: authorization, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword: 'wrong-password', newPassword: 'new-valid-password' })
+    });
+    assert.equal(wrongCurrentPasswordResponse.status, 400);
+    assert.match((await wrongCurrentPasswordResponse.json()).error, /Current password is incorrect/);
+
+    const changePasswordResponse = await fetch(`${origin}/admin/change-password`, {
+      method: 'POST',
+      headers: { Authorization: authorization, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword: password, newPassword: 'new-updated-password' })
+    });
+    assert.equal(changePasswordResponse.status, 200);
+    assert.equal((await changePasswordResponse.json()).message, 'Password changed successfully.');
+
+    const oldLoginResponse = await fetch(`${origin}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'admin', password })
+    });
+    assert.equal(oldLoginResponse.status, 401);
+
+    const newLoginResponse = await fetch(`${origin}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'admin', password: 'new-updated-password' })
+    });
+    assert.equal(newLoginResponse.status, 200);
+
+    const updatedAuthorization = `Basic ${Buffer.from('admin:new-updated-password').toString('base64')}`;
+
     const unsafeResponse = await fetch(`${origin}/admin/config`, {
       method: 'PUT',
-      headers: { Authorization: authorization, 'Content-Type': 'application/json' },
+      headers: { Authorization: updatedAuthorization, 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentVersion: '1.2.0', latestVersion: '1.3.0', forceUpdate: true })
     });
     const sanitized = await unsafeResponse.json();
@@ -269,9 +301,10 @@ test('serves public config and protects admin writes', async () => {
     const rateLimitedResponse = await fetch(`${origin}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'admin', password })
+      body: JSON.stringify({ username: 'admin', password: 'new-updated-password' })
     });
     assert.equal(rateLimitedResponse.status, 429);
+
     assert.ok(Number(rateLimitedResponse.headers.get('retry-after')) > 0);
     assert.deepEqual(await rateLimitedResponse.json(), {
       error: 'Too many login attempts. Try again later.'

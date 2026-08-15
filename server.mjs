@@ -164,6 +164,29 @@ const server = createServer(async (request, response) => {
       }, { 'Cache-Control': 'no-store' });
     }
 
+    if (request.method === 'POST' && url.pathname === '/admin/change-password') {
+      const payload = await readJson(request, maximumAdministratorRequestBytes);
+      const currentPassword = String(payload?.currentPassword || '');
+      const newPassword = String(payload?.newPassword || '');
+
+      if (!verifyPassword(currentPassword, administrator.passwordHash)) {
+        const error = new Error('Current password is incorrect.');
+        error.statusCode = 400;
+        throw error;
+      }
+
+      if (newPassword.length < 6) {
+        const error = new Error('New password must contain at least 6 characters.');
+        error.statusCode = 400;
+        throw error;
+      }
+
+      administrator.passwordHash = hashPassword(newPassword);
+      await saveAdministrators();
+      return sendJson(response, 200, { message: 'Password changed successfully.' }, { 'Cache-Control': 'no-store' });
+    }
+
+
     if (request.method === 'PUT' && url.pathname === '/admin/config') {
       const configuration = sanitizeConfig(await readJson(request, maximumConfigRequestBytes));
       await enrichPartnerProfiles(configuration.partnerServers);
