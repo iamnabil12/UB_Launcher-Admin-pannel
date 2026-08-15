@@ -5,43 +5,126 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>UB Launcher Control Center</title>
   <style>
-    :root{color-scheme:dark;--bg:#050a0f;--side:#07121b;--card:#0a1823;--soft:#0d202e;--line:#1c3c50;--text:#eff9ff;--muted:#8eaabd;--cyan:#55d7ff;--blue:#167fc1;--green:#48d99a;--red:#ff747d}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,system-ui,sans-serif}button,input,textarea{font:inherit}
+    :root{color-scheme:dark;--bg:#050a0f;--side:#07121b;--card:#0a1823;--card2:#07141e;--line:#1c3c50;--text:#eff9ff;--muted:#8eaabd;--cyan:#55d7ff;--blue:#167fc1;--green:#48d99a;--red:#ff747d}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,system-ui,sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}[hidden]{display:none!important}
     .shell{min-height:100vh;display:grid;grid-template-columns:238px 1fr}.sidebar{position:sticky;top:0;height:100vh;padding:26px 17px;background:linear-gradient(180deg,#091b29,var(--side));border-right:1px solid var(--line)}
     .brand{display:flex;align-items:center;gap:11px;padding:5px 9px 26px}.logo{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#05bfee,#1266bd);font-weight:900}.brand strong{display:block;font-size:16px}.brand span{font-size:11px;color:var(--muted)}
-    nav{display:grid;gap:6px}.nav{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:1px solid transparent;border-radius:8px;background:transparent;color:#9eb4c2;text-align:left;cursor:pointer}.nav:hover{background:#0d2534;color:white}.nav.active{background:#10324a;border-color:#1c5877;color:var(--cyan)}.nav b{width:20px;text-align:center}
+    nav{display:grid;gap:6px}.nav{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:1px solid transparent;border-radius:8px;background:transparent;color:#9eb4c2;text-align:left}.nav:hover{background:#0d2534;color:white}.nav.active{background:#10324a;border-color:#1c5877;color:var(--cyan)}.nav b{width:20px;text-align:center}
     .side-note{position:absolute;left:18px;right:18px;bottom:22px;padding:13px;border:1px solid #1b4b3a;border-radius:9px;background:#09241c;color:#6de5ad;font-size:12px}.content{min-width:0;padding:31px 34px 70px;background:radial-gradient(circle at 90% 0,#0c2c42 0,transparent 30%)}
-    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:25px}.topbar h1{margin:0 0 5px;font-size:27px}.topbar p,.muted{margin:0;color:var(--muted)}.refresh{border:1px solid #28536d;background:#0b1e2b;color:#cce9f8;border-radius:8px;padding:9px 13px;cursor:pointer}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:25px}.topbar h1{margin:0 0 5px;font-size:27px}.topbar p,.muted{margin:0;color:var(--muted)}.topbar-actions{display:flex;align-items:center;gap:9px}.admin-identity{display:flex;align-items:center;gap:9px;min-width:0;padding:6px 10px 6px 7px;border:1px solid #21465d;border-radius:9px;background:#081925;color:#cfe8f5}.admin-avatar{display:grid;place-items:center;width:27px;height:27px;border-radius:7px;background:linear-gradient(135deg,#0a9ed5,#155eb7);color:white;font-size:11px;font-weight:900}.admin-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700}.refresh,.logout-button{border:1px solid #28536d;background:#0b1e2b;color:#cce9f8;border-radius:8px;padding:9px 13px}.logout-button{border-color:#4e3443;color:#ffb3b9}.refresh:hover{border-color:#3a85aa;background:#0d2636}.logout-button:hover{border-color:#814452;background:#29131a;color:#ffd4d7}
     .page{display:none}.page.active{display:block}.stats{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px}.stat,.panel{border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#0c1c28,#08131d);box-shadow:0 15px 36px #0003}.stat{padding:17px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;margin-top:7px;font-size:25px}.stat em{font-size:11px;color:#63dca4;font-style:normal}
     .columns{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:14px}.panel{padding:21px;margin-bottom:14px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:17px}.panel h2{margin:0 0 5px;font-size:18px}.panel p{margin:0;color:var(--muted);line-height:1.5}
-    label{display:block;margin:14px 0 6px;font-weight:650;color:#d8eaf4}input,textarea{width:100%;padding:10px 11px;border:1px solid #2b5067;border-radius:7px;outline:0;background:#06121b;color:white}input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #32bdeb22}textarea{min-height:88px;resize:vertical}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.check{display:flex;align-items:center;gap:9px}.check input{width:auto}.help{margin-top:8px;color:#7291a5;font-size:12px}
-    .primary,.danger,.secondary{padding:10px 16px;border-radius:7px;font-weight:750;cursor:pointer}.primary{border:1px solid #51c9f8;background:var(--blue);color:white}.secondary{border:1px solid #31536a;background:#0a1b27;color:#cce2ef}.danger{border:1px solid #713844;background:#2c1219;color:#ff9da4}.primary:disabled{opacity:.55;cursor:wait}.savebar{position:sticky;bottom:15px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 15px;border:1px solid #25506a;border-radius:11px;background:#081722ee;backdrop-filter:blur(12px)}#message{color:#9cc6dd}#message.error{color:#ff969e}
-    .assets{display:grid;grid-template-columns:repeat(2,minmax(250px,1fr));gap:12px}.asset,.partner{padding:15px;border:1px solid #18384b;border-radius:9px;background:#07141e}.asset label{margin:0 0 8px}.asset input[type=file]{margin-top:8px;padding:7px;color:var(--muted)}.preview{display:none;width:100%;height:78px;margin-top:9px;object-fit:contain;border-radius:6px;background:#03090e}
-    .partner{margin-bottom:11px}.partner-title{display:flex;justify-content:space-between;align-items:center}.partner-title strong{font-size:15px}.partner-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.partner .check{margin-top:16px}.empty{padding:32px;text-align:center;border:1px dashed #2a4b60;border-radius:10px;color:var(--muted)}
-    table{width:100%;border-collapse:collapse}th{text-align:left;padding:10px;border-bottom:1px solid #284454;color:#86a8bb;font-size:11px;text-transform:uppercase}td{padding:11px 10px;border-bottom:1px solid #142d3c;color:#d8e8f1;white-space:nowrap}.table-wrap{overflow:auto}.pill{display:inline-block;padding:4px 7px;border-radius:99px;background:#102f43;color:#70d8ff;font-size:11px}.online{color:#61e5a8}.versions{display:grid;gap:9px}.version-row{display:grid;grid-template-columns:90px 1fr 35px;gap:9px;align-items:center}.bar{height:7px;border-radius:9px;background:#173244;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#1582c6,#4bd4f3)}.search{max-width:280px}
-    @media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}}@media(max-width:760px){.shell{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.side-note{display:none}.content{padding:22px 16px}.form-grid,.partner-grid,.assets{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+    label{display:block;margin:14px 0 6px;font-weight:650;color:#d8eaf4}input,textarea{width:100%;padding:10px 11px;border:1px solid #2b5067;border-radius:7px;outline:0;background:#06121b;color:white}input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #32bdeb22}textarea{min-height:82px;resize:vertical}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.check{display:flex;align-items:center;gap:9px}.check input{width:auto}.help{margin-top:8px;color:#7291a5;font-size:12px;line-height:1.5}
+    .primary,.danger,.secondary{padding:10px 16px;border-radius:7px;font-weight:750}.primary{border:1px solid #51c9f8;background:var(--blue);color:white}.secondary{border:1px solid #31536a;background:#0a1b27;color:#cce2ef}.danger{border:1px solid #713844;background:#2c1219;color:#ff9da4}.primary:disabled,.secondary:disabled,.danger:disabled{opacity:.55;cursor:wait}.actions{display:flex;align-items:center;gap:9px;margin-top:16px}
+    .savebar{position:sticky;bottom:15px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 15px;border:1px solid #25506a;border-radius:11px;background:#081722ee;backdrop-filter:blur(12px)}#message{color:#9cc6dd}#message.error{color:#ff969e}
+    .assets{display:grid;grid-template-columns:repeat(2,minmax(250px,1fr));gap:12px}.asset{padding:15px;border:1px solid #18384b;border-radius:9px;background:var(--card2)}.asset label{margin:0 0 8px}.asset input[type=file]{margin-top:8px;padding:7px;color:var(--muted)}.preview{display:none;width:100%;height:78px;margin-top:9px;object-fit:contain;border-radius:6px;background:#03090e}
+    .profile-note{margin:14px 0 2px;padding:10px 11px;border:1px solid #1d5067;border-radius:7px;background:#082031;color:#9ccde2;font-size:12px;line-height:1.45}.section-line{height:1px;margin:20px 0;background:#173748}.draft-head{display:flex;align-items:center;justify-content:space-between;margin:3px 0 12px}.draft-head h3{margin:0;font-size:15px}.count{padding:4px 8px;border-radius:99px;background:#10344a;color:#76d9ff;font-size:11px}
+    .server-list{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:11px}.server-card{padding:14px;border:1px solid #1e465c;border-radius:10px;background:#071722}.server-card-main{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center}.server-avatar{display:grid;place-items:center;width:46px;height:46px;border-radius:9px;overflow:hidden;background:linear-gradient(145deg,#0a8fc0,#125092);font-weight:900}.server-avatar img{width:100%;height:100%;object-fit:cover}.server-title{min-width:0}.server-title strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.server-title span{display:block;margin-top:4px;color:#78b8d6;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.server-actions{display:flex;gap:6px}.server-actions button{padding:7px 9px}.server-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.pill{display:inline-block;padding:4px 7px;border-radius:99px;background:#102f43;color:#70d8ff;font-size:11px}.server-description{margin-top:10px;color:#9cb4c3;font-size:12px;line-height:1.45}.empty{padding:32px;text-align:center;border:1px dashed #2a4b60;border-radius:10px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse}th{text-align:left;padding:10px;border-bottom:1px solid #284454;color:#86a8bb;font-size:11px;text-transform:uppercase}td{padding:11px 10px;border-bottom:1px solid #142d3c;color:#d8e8f1;white-space:nowrap}.table-wrap{overflow:auto}.online{color:#61e5a8}.versions{display:grid;gap:9px}.version-row{display:grid;grid-template-columns:90px 1fr 35px;gap:9px;align-items:center}.bar{height:7px;border-radius:9px;background:#173244;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#1582c6,#4bd4f3)}
+    .local-warning{display:none;margin-bottom:14px;padding:11px 13px;border:1px solid #6b5420;border-radius:9px;background:#211806;color:#f1ca6c;font-size:12px;line-height:1.5}.local-warning.show{display:block}
+
+    /* Authentication */
+    .login-view{position:relative;isolation:isolate;display:grid;place-items:center;min-height:100vh;min-height:100dvh;padding:34px 22px;overflow:hidden;background:#03080d}
+    .login-view::before{content:"";position:absolute;z-index:-3;inset:0;background:radial-gradient(circle at 15% 18%,#0c5e9138 0,transparent 31%),radial-gradient(circle at 88% 74%,#0c86a62b 0,transparent 28%),linear-gradient(145deg,#02070b 0%,#06121b 48%,#03090e 100%)}
+    .login-view::after{content:"";position:absolute;z-index:-2;inset:0;opacity:.15;background-image:linear-gradient(#4ebae60d 1px,transparent 1px),linear-gradient(90deg,#4ebae60d 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+    .login-orb{position:absolute;z-index:-1;width:440px;height:440px;border:1px solid #1fa9e421;border-radius:50%;filter:drop-shadow(0 0 42px #008cc92c);animation:orb-float 9s ease-in-out infinite}.login-orb::before,.login-orb::after{content:"";position:absolute;border:1px solid #1fa9e421;border-radius:inherit;inset:48px}.login-orb::after{inset:105px}.login-orb.one{left:-210px;top:-170px}.login-orb.two{right:-230px;bottom:-235px;animation-delay:-4s}
+    .login-card{width:min(1010px,100%);min-height:620px;display:grid;grid-template-columns:1.05fr .95fr;border:1px solid #315970a8;border-radius:24px;overflow:hidden;background:#07121bec;box-shadow:0 34px 90px #000a,0 0 0 1px #75d9ff0b inset;backdrop-filter:blur(20px)}
+    .login-showcase{position:relative;display:flex;flex-direction:column;justify-content:space-between;min-width:0;padding:50px;background:linear-gradient(155deg,#0a2638 0%,#071a27 54%,#07131d 100%);overflow:hidden}
+    .login-showcase::after{content:"";position:absolute;width:360px;height:360px;right:-155px;bottom:-165px;border-radius:50%;background:radial-gradient(circle,#1ec8f542 0,transparent 68%)}
+    .login-brand{position:relative;z-index:1;display:flex;align-items:center;gap:14px}.login-brand-mark{position:relative;display:grid;place-items:center;width:52px;height:52px;border:1px solid #5ddcff77;border-radius:15px;background:linear-gradient(145deg,#0cb3e9,#1050a7);box-shadow:0 10px 34px #008cd35c,0 0 0 5px #3bcaff0c;color:white;font-size:18px;font-weight:950;letter-spacing:-1px}.login-brand-mark::after{content:"";position:absolute;inset:4px;border:1px solid #dff9ff38;border-radius:11px}.login-brand-copy strong{display:block;font-size:19px;letter-spacing:.01em}.login-brand-copy span{display:block;margin-top:3px;color:#78b5d0;font-size:11px;letter-spacing:.13em;text-transform:uppercase}
+    .login-hero{position:relative;z-index:1;max-width:440px;margin:70px 0}.secure-emblem{display:grid;place-items:center;width:76px;height:76px;margin-bottom:26px;border:1px solid #48cff37a;border-radius:22px;background:linear-gradient(145deg,#0d354b,#0a1f2f);box-shadow:0 0 48px #00bff02e,0 12px 28px #0007}.secure-emblem svg{width:34px;height:34px;fill:none;stroke:#6ee5ff;stroke-width:1.7;filter:drop-shadow(0 0 7px #31c8ff)}
+    .login-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:13px;color:#5bdcff;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.login-eyebrow::before{content:"";width:25px;height:1px;background:#4bd8ff}.login-hero h1{max-width:390px;margin:0;color:#f5fbff;font-size:42px;line-height:1.08;letter-spacing:-.035em}.login-hero h1 span{color:#54d7ff}.login-hero p{max-width:405px;margin:19px 0 0;color:#9bb8c8;font-size:15px;line-height:1.7}
+    .login-trust{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:10px}.trust-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #24506a;border-radius:99px;background:#071924a8;color:#a8c7d6;font-size:11px}.trust-item i{width:6px;height:6px;border-radius:50%;background:#4be3a0;box-shadow:0 0 9px #4be3a0}
+    .login-form-side{display:flex;align-items:center;padding:52px 54px;background:linear-gradient(180deg,#08131d,#050d14)}.login-form-wrap{width:100%;max-width:370px;margin:auto}.login-form-head{margin-bottom:31px}.login-form-head h2{margin:0 0 9px;font-size:29px;letter-spacing:-.025em}.login-form-head p{margin:0;color:#829eaf;line-height:1.55}.login-form label{margin:17px 0 8px;color:#cce3ef;font-size:12px}.login-field{position:relative}.login-field svg{position:absolute;left:14px;top:50%;width:18px;height:18px;transform:translateY(-50%);fill:none;stroke:#729bb1;stroke-width:1.8;pointer-events:none}.login-field input{height:50px;padding:0 46px;border-color:#24485d;border-radius:10px;background:#06111a;transition:border-color .18s,box-shadow .18s,background .18s}.login-field input:hover{border-color:#34657e}.login-field input:focus{border-color:#43c8f1;background:#071722;box-shadow:0 0 0 4px #23bde51b}.password-toggle{position:absolute;right:7px;top:50%;display:grid;place-items:center;width:37px;height:37px;padding:0;transform:translateY(-50%);border:0;border-radius:8px;background:transparent;color:#87a5b6}.password-toggle:hover{background:#102534;color:#d7f2ff}.password-toggle svg{position:static;width:19px;height:19px;transform:none;stroke:currentColor;pointer-events:none}.login-meta{display:flex;align-items:center;justify-content:space-between;min-height:25px;margin-top:9px;color:#638094;font-size:11px}.caps-warning{display:flex;align-items:center;gap:5px;color:#e8bd6e}.caps-warning::before{content:"!";display:grid;place-items:center;width:15px;height:15px;border:1px solid #e8bd6e66;border-radius:50%;font-size:9px;font-weight:900}.login-error{display:flex;align-items:flex-start;gap:9px;margin-top:17px;padding:11px 12px;border:1px solid #6c3542;border-radius:9px;background:#29131a;color:#ffadb3;font-size:12px;line-height:1.45}.login-error::before{content:"!";flex:0 0 auto;display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#ff747d;color:#26090d;font-size:11px;font-weight:950}.login-submit{position:relative;width:100%;height:52px;margin-top:22px;border:1px solid #66ddff;border-radius:10px;overflow:hidden;background:linear-gradient(100deg,#0879ce,#05a9dd);box-shadow:0 11px 27px #007bbb3d;color:white;font-weight:850;letter-spacing:.01em;transition:transform .16s,box-shadow .16s,filter .16s}.login-submit::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,#ffffff27 48%,transparent 70%);transform:translateX(-120%);transition:transform .55s}.login-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 14px 35px #008bd052;filter:brightness(1.06)}.login-submit:hover:not(:disabled)::before{transform:translateX(120%)}.login-submit:active:not(:disabled){transform:translateY(0)}.login-submit:disabled{cursor:wait;opacity:.72}.button-content{display:flex;align-items:center;justify-content:center;gap:10px}.login-spinner{width:18px;height:18px;border:2px solid #ffffff52;border-top-color:white;border-radius:50%;animation:spin .75s linear infinite}.login-footnote{display:flex;align-items:center;justify-content:center;gap:7px;margin:22px 0 0;color:#587486;font-size:11px}.login-footnote svg{width:14px;height:14px;fill:none;stroke:#638b9f;stroke-width:1.8}.login-status{display:flex;align-items:center;justify-content:center;gap:8px;min-height:21px;margin-bottom:13px;color:#76a2b8;font-size:11px}.login-status i{width:7px;height:7px;border:2px solid #4ed7ff;border-top-color:transparent;border-radius:50%;animation:spin .75s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}@keyframes orb-float{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(20px,14px,0)}}
+    @media(prefers-reduced-motion:reduce){.login-orb,.login-spinner,.login-status i{animation:none}.login-submit{transition:none}}
+    @media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.server-list{grid-template-columns:1fr}}
+    @media(max-width:800px){.login-view{padding:18px}.login-card{max-width:520px;min-height:0;grid-template-columns:1fr}.login-showcase{padding:28px 30px 25px}.login-hero{margin:45px 0 34px}.login-hero h1{font-size:34px}.login-hero p{font-size:14px}.secure-emblem{width:62px;height:62px;margin-bottom:20px}.login-trust{display:none}.login-form-side{padding:35px 30px 38px}.login-form-wrap{max-width:none}}
+    @media(max-width:760px){.shell{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.side-note{display:none}.content{padding:22px 16px}.form-grid,.assets{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.topbar{align-items:flex-start}.topbar-actions{flex-wrap:wrap;justify-content:flex-end}.admin-identity{order:-1}.admin-name{display:none}}
+    @media(max-width:470px){.login-view{padding:0}.login-card{min-height:100vh;min-height:100dvh;border:0;border-radius:0}.login-showcase{padding:25px 23px 21px}.login-brand-mark{width:44px;height:44px;border-radius:13px}.login-brand-copy strong{font-size:16px}.login-hero{margin:34px 0 18px}.secure-emblem{display:none}.login-eyebrow{margin-bottom:10px}.login-hero h1{font-size:29px}.login-hero p{margin-top:13px;line-height:1.55}.login-form-side{padding:30px 23px 35px}.login-form-head{margin-bottom:22px}.login-form-head h2{font-size:25px}.topbar{display:block}.topbar-actions{justify-content:flex-start;margin-top:14px}.stats{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-<div class="shell">
+<div class="login-view" id="loginView" aria-labelledby="loginHeading">
+  <div class="login-orb one" aria-hidden="true"></div>
+  <div class="login-orb two" aria-hidden="true"></div>
+  <div class="login-card">
+    <section class="login-showcase" aria-label="UB Launcher Control Center">
+      <div class="login-brand">
+        <div class="login-brand-mark" aria-hidden="true">UB</div>
+        <div class="login-brand-copy"><strong>UB Launcher</strong><span>Control Center</span></div>
+      </div>
+      <div class="login-hero">
+        <div class="secure-emblem" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10M6 10h12v10H6z"/><path d="M12 14v2.5"/></svg>
+        </div>
+        <div class="login-eyebrow">Secure administration</div>
+        <h1>Everything UB Launcher, <span>under control.</span></h1>
+        <p>Manage releases, partner servers, branding, and launcher activity from one protected workspace.</p>
+      </div>
+      <div class="login-trust" aria-label="Security information">
+        <span class="trust-item"><i aria-hidden="true"></i>Private admin session</span>
+        <span class="trust-item"><i aria-hidden="true"></i>Authorized admins only</span>
+      </div>
+    </section>
+    <section class="login-form-side">
+      <div class="login-form-wrap">
+        <div class="login-status" id="loginStatus" role="status"><i aria-hidden="true"></i><span>Checking your session...</span></div>
+        <div class="login-form-head"><h2 id="loginHeading">Welcome back</h2><p>Sign in with your administrator account to continue.</p></div>
+        <form class="login-form" id="loginForm" novalidate>
+          <label for="loginUsername">Username</label>
+          <div class="login-field">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg>
+            <input id="loginUsername" name="username" type="text" maxlength="32" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Enter your username" required aria-describedby="loginError">
+          </div>
+          <label for="loginPassword">Password</label>
+          <div class="login-field">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input id="loginPassword" name="password" type="password" minlength="6" autocomplete="current-password" placeholder="Enter your password" required aria-describedby="loginError capsWarning">
+            <button class="password-toggle" id="passwordToggle" type="button" aria-label="Show password" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+            </button>
+          </div>
+          <div class="login-meta"><span class="caps-warning" id="capsWarning" hidden>Caps Lock is on</span><span>Minimum 6 characters</span></div>
+          <div class="login-error" id="loginError" role="alert" aria-live="assertive" hidden></div>
+          <button class="login-submit" id="loginButton" type="submit">
+            <span class="button-content" id="loginButtonContent"><span>Sign in to Control Center</span><span aria-hidden="true">&#8594;</span></span>
+            <span class="button-content" id="loginButtonLoading" hidden><i class="login-spinner" aria-hidden="true"></i><span>Signing in...</span></span>
+          </button>
+        </form>
+        <p class="login-footnote"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10M6 10h12v10H6z"/></svg>Protected by a private administrator session.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="shell" id="adminShell" hidden>
   <aside class="sidebar">
     <div class="brand"><div class="logo">UB</div><div><strong>Control Center</strong><span>Launcher administration</span></div></div>
     <nav>
-      <button class="nav active" data-page="overview"><b>⌂</b>Overview</button>
-      <button class="nav" data-page="updates"><b>↑</b>Launcher update</button>
-      <button class="nav" data-page="partners"><b>◈</b>Partner servers</button>
-      <button class="nav" data-page="branding"><b>◇</b>Branding assets</button>
-      <button class="nav" data-page="users"><b>◎</b>User base</button>
+      <button class="nav active" data-page="overview"><b>&#8962;</b>Overview</button>
+      <button class="nav" data-page="updates"><b>&uarr;</b>Launcher update</button>
+      <button class="nav" data-page="partners"><b>&#9670;</b>Partner servers</button>
+      <button class="nav" data-page="branding"><b>&#9671;</b>Branding assets</button>
+      <button class="nav" data-page="administrators"><b>&#128274;</b>Administrators</button>
     </nav>
-    <div class="side-note">● API service online</div>
+    <div class="side-note">&#9679; API service online</div>
   </aside>
 
   <main class="content">
-    <div class="topbar"><div><h1 id="pageTitle">Overview</h1><p id="pageSubtitle">Launcher health and user activity at a glance.</p></div><button class="refresh" id="refreshButton">↻ Refresh</button></div>
+    <div class="topbar">
+      <div><h1 id="pageTitle">Overview</h1><p id="pageSubtitle">Launcher health and activity at a glance.</p></div>
+      <div class="topbar-actions">
+        <div class="admin-identity" title="Signed-in administrator"><span class="admin-avatar" id="adminAvatar">A</span><span class="admin-name" id="adminName">Administrator</span></div>
+        <button class="refresh" id="refreshButton" type="button">&#8635; Refresh</button>
+        <button class="logout-button" id="logoutButton" type="button">Log out</button>
+      </div>
+    </div>
+    <div class="local-warning" id="localWarning"><b>Local test panel:</b> changes save only on this PC. The public launcher will receive them after this panel is hosted at <b>launcher.unitedbangla.top</b>.</div>
 
     <section class="page active" id="overviewPage">
       <div class="stats">
-        <div class="stat"><span>Total users</span><strong id="totalUsers">0</strong><em>Opted-in installs</em></div>
+        <div class="stat"><span>Total installs</span><strong id="totalUsers">0</strong><em>Analytics enabled</em></div>
         <div class="stat"><span>Online now</span><strong id="onlineNow">0</strong><em>Last 10 minutes</em></div>
         <div class="stat"><span>Active today</span><strong id="active24h">0</strong><em>Last 24 hours</em></div>
         <div class="stat"><span>Active this week</span><strong id="active7d">0</strong><em>Last 7 days</em></div>
@@ -49,73 +132,149 @@
         <div class="stat"><span>Game launches</span><strong id="totalGameLaunches">0</strong><em>All time</em></div>
       </div>
       <div class="columns">
-        <div class="panel"><div class="panel-head"><div><h2>Recent users</h2><p>Latest opted-in launcher activity.</p></div></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Version</th><th>OS</th><th>Last seen</th></tr></thead><tbody id="recentUsers"></tbody></table></div></div>
+        <div class="panel"><div class="panel-head"><div><h2>Recent activity</h2><p>Latest anonymous launcher activity.</p></div></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Version</th><th>OS</th><th>Last seen</th></tr></thead><tbody id="recentUsers"></tbody></table></div></div>
         <div class="panel"><div class="panel-head"><div><h2>Version distribution</h2><p>Installed launcher versions.</p></div></div><div class="versions" id="versionChart"></div></div>
       </div>
     </section>
 
     <section class="page" id="updatesPage">
-      <div class="panel"><div class="panel-head"><div><h2>Update popup</h2><p>Control which versions receive optional or mandatory update notices.</p></div></div>
+      <div class="panel"><div class="panel-head"><div><h2>Update popup</h2><p>Control optional and mandatory launcher updates.</p></div></div>
         <div class="form-grid"><div><label for="currentVersion">Current version</label><input id="currentVersion" placeholder="1.1.0"></div><div><label for="latestVersion">Latest version</label><input id="latestVersion" placeholder="1.2.0"></div></div>
         <label for="updateTitle">Popup title</label><input id="updateTitle" maxlength="120">
         <label for="updateMessage">Popup message</label><textarea id="updateMessage" maxlength="500"></textarea>
         <label for="updateUrl">Update/download page (HTTPS)</label><input id="updateUrl" type="url" placeholder="https://launcher.unitedbangla.top/download">
         <label for="releaseNotesUrl">What's New / release notes page (HTTPS)</label><input id="releaseNotesUrl" type="url" placeholder="https://launcher.unitedbangla.top/releases/1.2.0">
-        <label class="check"><input id="forceUpdate" type="checkbox">Force update—hide the Later button below minimum version</label>
-        <div class="help">Safety: force update cannot be enabled without a valid HTTPS update URL.</div>
+        <label class="check"><input id="forceUpdate" type="checkbox">Force update and hide the Later button</label>
+        <div class="help">Force update requires a valid HTTPS update URL.</div>
       </div>
     </section>
 
     <section class="page" id="partnersPage">
-      <div class="panel"><div class="panel-head"><div><h2>Partner servers</h2><p>Add Minecraft servers that will appear inside UB Launcher.</p></div><button class="primary" id="addPartnerButton">+ Add server</button></div><div id="partnerList"></div></div>
-    </section>
-
-    <section class="page" id="brandingPage">
-      <div class="panel"><div class="panel-head"><div><h2>Launcher branding</h2><p>Upload images and SVG icons. Uploaded files activate only after Publish.</p></div></div><div class="assets" id="assets"></div></div>
-    </section>
-
-    <section class="page" id="usersPage">
-      <div class="panel"><div class="panel-head"><div><h2>User base monitor</h2><p>Only users who enable anonymous telemetry are listed. Email stays unavailable until real account authentication exists.</p></div><input class="search" id="userSearch" placeholder="Search ID, version, OS…"></div>
-        <div class="table-wrap"><table><thead><tr><th>Install/User</th><th>Account</th><th>Email</th><th>Version</th><th>OS / Arch</th><th>Locale</th><th>Last event</th><th>Sessions</th><th>Launches</th><th>First seen</th><th>Last seen</th></tr></thead><tbody id="allUsers"></tbody></table></div>
+      <div class="panel">
+        <div class="panel-head"><div><h2 id="partnerEditorTitle">Add partner server</h2><p>Fill this form, then press Add server. The completed server will move into a box below.</p></div></div>
+        <div class="form-grid">
+          <div><label for="partnerAddress">Server address *</label><input id="partnerAddress" placeholder="play.example.com:25565"></div>
+          <div><label for="partnerName">Display name (optional)</label><input id="partnerName" maxlength="80" placeholder="Auto from server MOTD"></div>
+          <div><label for="partnerBadge">Badge</label><input id="partnerBadge" maxlength="24" value="PARTNER" placeholder="OFFICIAL / PARTNER"></div>
+          <div><label for="partnerWebsite">Website URL (optional, HTTPS)</label><input id="partnerWebsite" type="url" placeholder="https://example.com"></div>
+          <div><label for="partnerVersion">Minecraft version (optional)</label><input id="partnerVersion" maxlength="32" placeholder="Auto from server"></div>
+          <div><label class="check"><input id="partnerEnabled" type="checkbox" checked>Visible in launcher</label></div>
+        </div>
+        <label for="partnerDescription">Description (optional)</label><textarea id="partnerDescription" maxlength="180" placeholder="Auto from server MOTD"></textarea>
+        <div class="profile-note">The favicon, MOTD, and Minecraft version are read automatically from the server address when you publish. No icon URL is needed.</div>
+        <div class="actions"><button class="primary" id="savePartnerButton" type="button">+ Add server</button><button class="secondary" id="cancelPartnerEditButton" type="button" hidden>Cancel edit</button></div>
+        <div class="section-line"></div>
+        <div class="draft-head"><h3>Added servers</h3><span class="count" id="partnerCount">0 servers</span></div>
+        <div class="server-list" id="partnerList"></div>
       </div>
     </section>
 
-    <div class="savebar"><div id="message">Loading configuration…</div><button class="primary" id="publishButton">Publish launcher changes</button></div>
+    <section class="page" id="brandingPage">
+      <div class="panel"><div class="panel-head"><div><h2>Launcher branding</h2><p>Upload images and SVG icons. Press Publish to activate them.</p></div></div><div class="assets" id="assets"></div></div>
+    </section>
+
+    <section class="page" id="administratorsPage">
+      <div class="panel"><div class="panel-head"><div><h2>Administrator access</h2><p>Add trusted people who can sign in and manage UB Launcher.</p></div></div>
+        <div class="form-grid"><div><label for="administratorUsername">New username</label><input id="administratorUsername" maxlength="32" autocomplete="username" placeholder="moderator.name"></div><div><label for="administratorPassword">New password</label><input id="administratorPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters"></div></div>
+        <div class="help">Passwords are stored securely and never shown again. Every administrator has full control.</div>
+        <div class="actions"><button class="primary" id="addAdministratorButton" type="button">+ Add administrator</button></div>
+      </div>
+      <div class="panel"><div class="panel-head"><div><h2>Administrator accounts</h2><p>Remove access when someone no longer manages the launcher.</p></div></div><div class="table-wrap"><table><thead><tr><th>Username</th><th>Added</th><th>Access</th></tr></thead><tbody id="administratorList"></tbody></table></div></div>
+    </section>
+
+    <div class="savebar"><div id="message">Loading configuration...</div><button class="primary" id="publishButton">Publish launcher changes</button></div>
   </main>
 </div>
 
 <script>
-if(new URL(location.href).username)history.replaceState(null,'',`${location.protocol}//${location.host}${location.pathname}`);
-const pageInfo={overview:['Overview','Launcher health and user activity at a glance.'],updates:['Launcher update','Publish fixes and require outdated versions to update.'],partners:['Partner servers','Manage servers promoted inside UB Launcher.'],branding:['Branding assets','Change banners, logos, and launcher SVG icons.'],users:['User base','Monitor privacy-safe, opted-in launcher activity.']};
+const pageInfo={overview:['Overview','Launcher health and activity at a glance.'],updates:['Launcher update','Publish fixes and control update popups.'],partners:['Partner servers','Add servers promoted inside UB Launcher.'],branding:['Branding assets','Change launcher banners, logos, and icons.'],administrators:['Administrators','Manage who can sign in to the Control Center.']};
 const assetFields=[['heroBanner','Home banner','image/png,image/jpeg,image/webp'],['discordBanner','Discord banner','image/png,image/jpeg,image/webp'],['logo','UB logo','image/png,image/jpeg,image/webp'],['homeIcon','Home icon','.svg'],['instanceIcon','Instance icon','.svg'],['modsIcon','Content icon','.svg'],['customizeIcon','Customize icon','.svg'],['performanceIcon','Performance icon','.svg'],['serverIcon','Create server icon','.svg'],['settingsIcon','Settings icon','.svg'],['discordIcon','Discord icon','.svg'],['tiktokIcon','TikTok icon','.svg'],['youtubeIcon','YouTube icon','.svg'],['webIcon','Website icon','.svg']];
-let config={assets:{},partnerServers:[]};let analytics={summary:{},versions:[],users:[]};
+class AuthenticationRequired extends Error{}
+let config={assets:{},partnerServers:[]};let analytics={summary:{},versions:[],users:[]};let administrators=[];let editingPartnerIndex=-1;let authenticated=false;let currentAdministrator='Administrator';
 const $=selector=>document.querySelector(selector);const message=$('#message');const publishButton=$('#publishButton');
 
 for(const button of document.querySelectorAll('.nav'))button.onclick=()=>showPage(button.dataset.page);
-$('#refreshButton').onclick=loadAll;$('#publishButton').onclick=publishConfig;$('#addPartnerButton').onclick=()=>{config.partnerServers.push(newPartner());renderPartners()};$('#userSearch').oninput=renderAllUsers;
-
+$('#refreshButton').onclick=loadAll;$('#publishButton').onclick=publishConfig;$('#savePartnerButton').onclick=savePartnerDraft;$('#cancelPartnerEditButton').onclick=resetPartnerEditor;$('#addAdministratorButton').onclick=addAdministrator;$('#logoutButton').onclick=logout;
+$('#loginForm').addEventListener('submit',login);$('#passwordToggle').onclick=togglePasswordVisibility;$('#loginPassword').addEventListener('keydown',updateCapsLock);$('#loginPassword').addEventListener('keyup',updateCapsLock);
 $('#assets').innerHTML=assetFields.map(([key,label,accept])=>`<div class="asset"><label>${escapeHtml(label)}</label><input id="${key}" data-asset="${key}" type="url" placeholder="HTTPS asset URL"><input data-upload="${key}" type="file" accept="${accept}"><img id="${key}Preview" class="preview" alt="Preview"></div>`).join('');
 for(const input of document.querySelectorAll('[data-upload]'))input.onchange=()=>uploadAsset(input);
-
-loadAll();
-
-async function loadAll(){setMessage('Refreshing dashboard…');try{const [configResponse,analyticsResponse]=await Promise.all([fetch(apiUrl('/admin/config'),{cache:'no-store'}),fetch(apiUrl('/admin/analytics'),{cache:'no-store'})]);if(!configResponse.ok||!analyticsResponse.ok)throw new Error('Could not load dashboard data.');config=await configResponse.json();analytics=await analyticsResponse.json();bindConfig();renderAnalytics();setMessage('Everything is up to date.')}catch(error){setMessage(error.message,true)}}
-function bindConfig(){for(const key of ['currentVersion','latestVersion','updateTitle','updateMessage','updateUrl','releaseNotesUrl'])$('#'+key).value=config[key]||'';$('#forceUpdate').checked=Boolean(config.forceUpdate);config.partnerServers=Array.isArray(config.partnerServers)?config.partnerServers:[];for(const [key] of assetFields)setAsset(key,config.assets?.[key]||'');renderPartners()}
+if(['127.0.0.1','localhost'].includes(location.hostname))$('#localWarning').classList.add('show');
+bootstrapAuthentication();
 
 function showPage(name){for(const button of document.querySelectorAll('.nav'))button.classList.toggle('active',button.dataset.page===name);for(const page of document.querySelectorAll('.page'))page.classList.toggle('active',page.id===name+'Page');$('#pageTitle').textContent=pageInfo[name][0];$('#pageSubtitle').textContent=pageInfo[name][1]}
 
-function renderPartners(){const host=$('#partnerList');if(!config.partnerServers.length){host.innerHTML='<div class="empty">No partner servers yet. Click “Add server” to create one.</div>';return}host.innerHTML=config.partnerServers.map((server,index)=>`<div class="partner" data-partner="${index}"><div class="partner-title"><strong>${escapeHtml(server.name||'New partner server')}</strong><button class="danger" data-remove="${index}">Remove</button></div><div class="partner-grid"><div><label>Server name</label><input data-field="name" value="${attribute(server.name)}" placeholder="United Bangla SMP"></div><div><label>Server address</label><input data-field="address" value="${attribute(server.address)}" placeholder="play.example.com:25565"></div><div><label>Minecraft version</label><input data-field="version" value="${attribute(server.version)}" placeholder="1.8–1.21"></div><div><label>Badge</label><input data-field="badge" value="${attribute(server.badge)}" placeholder="OFFICIAL / PARTNER"></div><div><label>Icon URL (HTTPS)</label><input data-field="iconUrl" value="${attribute(server.iconUrl)}"></div><div><label>Website URL (HTTPS)</label><input data-field="websiteUrl" value="${attribute(server.websiteUrl)}"></div></div><label>Description</label><textarea data-field="description">${escapeHtml(server.description||'')}</textarea><label class="check"><input data-field="enabled" type="checkbox" ${server.enabled!==false?'checked':''}>Visible in launcher</label></div>`).join('');for(const card of host.querySelectorAll('[data-partner]')){const index=Number(card.dataset.partner);for(const input of card.querySelectorAll('[data-field]')){input.oninput=()=>{config.partnerServers[index][input.dataset.field]=input.type==='checkbox'?input.checked:input.value;card.querySelector('strong').textContent=config.partnerServers[index].name||'New partner server';};}for(const input of card.querySelectorAll('[data-field][type=checkbox]'))input.onchange=input.oninput;}for(const button of host.querySelectorAll('[data-remove]'))button.onclick=()=>{config.partnerServers.splice(Number(button.dataset.remove),1);renderPartners();};}
-function newPartner(){return{id:'server-'+Date.now(),name:'',address:'',description:'',version:'Any version',badge:'PARTNER',iconUrl:'',websiteUrl:'',enabled:true}}
+async function bootstrapAuthentication(){
+  setLoginChecking(true);
+  try{
+    const response=await fetch(apiUrl('/admin/session'),{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'}});
+    if(response.status===401){showLogin();return}
+    if(!response.ok)throw new Error('The sign-in service is temporarily unavailable.');
+    const session=await readResponseJson(response);
+    if(session?.authenticated===false){showLogin();return}
+    showDashboard(getAdministratorName(session));
+    await loadAll();
+  }catch(error){if(!(error instanceof AuthenticationRequired))showLogin(error.message||'Could not verify your session. Please sign in.')}
+}
 
-async function publishConfig(){syncConfig();if(config.forceUpdate&&!config.updateUrl)return setMessage('Force update requires an HTTPS update URL.',true);setBusy(true);setMessage('Publishing changes…');try{const response=await fetch(apiUrl('/admin/config'),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(config)});const result=await response.json();if(!response.ok)throw new Error(result.error||'Publish failed.');config=result;bindConfig();setMessage('Published. Launchers will receive these changes on next open.')}catch(error){setMessage(error.message,true)}finally{setBusy(false)}}
+async function login(event){
+  event.preventDefault();
+  const username=$('#loginUsername').value.trim();const password=$('#loginPassword').value;
+  hideLoginError();
+  if(!username){showLoginError('Enter your administrator username.');$('#loginUsername').focus();return}
+  if(password.length<6){showLoginError('Password must contain at least 6 characters.');$('#loginPassword').focus();return}
+  setLoginBusy(true);
+  try{
+    const response=await fetch(apiUrl('/admin/login'),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({username,password})});
+    const result=await readResponseJson(response);
+    if(!response.ok)throw new Error(result?.error||(response.status===401?'Incorrect username or password.':'Could not sign in. Please try again.'));
+    showDashboard(getAdministratorName(result)||username);
+    await loadAll();
+  }catch(error){if(!(error instanceof AuthenticationRequired)){showLoginError(error.message||'Could not sign in. Please try again.');$('#loginPassword').select()}}
+  finally{setLoginBusy(false)}
+}
+
+async function logout(){
+  const button=$('#logoutButton');button.disabled=true;
+  try{await fetch(apiUrl('/admin/logout'),{method:'POST',credentials:'same-origin',headers:{Accept:'application/json'}})}catch{}
+  finally{button.disabled=false;authenticated=false;config={assets:{},partnerServers:[]};analytics={summary:{},versions:[],users:[]};administrators=[];showLogin();$('#loginUsername').focus()}
+}
+
+function showDashboard(name){authenticated=true;currentAdministrator=name||'Administrator';$('#loginView').hidden=true;$('#adminShell').hidden=false;$('#adminName').textContent=currentAdministrator;$('#adminAvatar').textContent=currentAdministrator.charAt(0).toUpperCase()||'A';$('#loginPassword').value='';hideLoginError();setLoginChecking(false);document.title='UB Launcher Control Center'}
+function showLogin(error=''){authenticated=false;$('#adminShell').hidden=true;$('#loginView').hidden=false;$('#loginPassword').value='';setLoginBusy(false);setLoginChecking(false);if(error)showLoginError(error);else hideLoginError();document.title='Sign in | UB Launcher Control Center';requestAnimationFrame(()=>$('#loginUsername').focus())}
+function setLoginChecking(value){$('#loginStatus').hidden=!value;$('#loginForm').setAttribute('aria-busy',String(value));for(const control of $('#loginForm').elements)control.disabled=value}
+function setLoginBusy(value){$('#loginButton').disabled=value;$('#loginUsername').disabled=value;$('#loginPassword').disabled=value;$('#passwordToggle').disabled=value;$('#loginButtonContent').hidden=value;$('#loginButtonLoading').hidden=!value;$('#loginForm').setAttribute('aria-busy',String(value))}
+function showLoginError(value){const host=$('#loginError');host.textContent=value;host.hidden=false}
+function hideLoginError(){$('#loginError').hidden=true;$('#loginError').textContent=''}
+function togglePasswordVisibility(){const input=$('#loginPassword');const visible=input.type==='text';input.type=visible?'password':'text';$('#passwordToggle').setAttribute('aria-pressed',String(!visible));$('#passwordToggle').setAttribute('aria-label',visible?'Show password':'Hide password');input.focus()}
+function updateCapsLock(event){$('#capsWarning').hidden=!Boolean(event.getModifierState?.('CapsLock'))}
+function getAdministratorName(payload){const administrator=payload?.administrator||payload?.user||payload;return typeof administrator?.username==='string'?administrator.username.trim():''}
+async function readResponseJson(response){const text=await response.text();if(!text)return{};try{return JSON.parse(text)}catch{return{}}}
+async function adminFetch(path,options={}){const response=await fetch(apiUrl(path),{...options,credentials:'same-origin'});if(response.status===401){showLogin('Your session expired. Sign in again to continue.');throw new AuthenticationRequired()}return response}
+
+async function loadAll(){if(!authenticated)return;setMessage('Refreshing dashboard...');try{const [configResponse,analyticsResponse,administratorsResponse]=await Promise.all([adminFetch('/admin/config',{cache:'no-store'}),adminFetch('/admin/analytics',{cache:'no-store'}),adminFetch('/admin/administrators',{cache:'no-store'})]);if(!configResponse.ok||!analyticsResponse.ok||!administratorsResponse.ok)throw new Error('Could not load dashboard data.');config=await configResponse.json();analytics=await analyticsResponse.json();administrators=(await administratorsResponse.json()).administrators||[];bindConfig();renderAnalytics();renderAdministrators();setMessage('Everything is up to date.')}catch(error){if(!(error instanceof AuthenticationRequired))setMessage(error.message,true)}}
+function bindConfig(){for(const key of ['currentVersion','latestVersion','updateTitle','updateMessage','updateUrl','releaseNotesUrl'])$('#'+key).value=config[key]||'';$('#forceUpdate').checked=Boolean(config.forceUpdate);config.assets=config.assets&&typeof config.assets==='object'?config.assets:{};config.partnerServers=Array.isArray(config.partnerServers)?config.partnerServers:[];for(const [key] of assetFields)setAsset(key,config.assets[key]||'');editingPartnerIndex=-1;resetPartnerEditor();renderPartnerCards()}
+
+function readPartnerDraft(){const address=$('#partnerAddress').value.trim();if(!/^[a-zA-Z0-9.-]+(?::[0-9]{1,5})?$/.test(address))throw new Error('Enter a valid Minecraft server address.');const port=address.includes(':')?Number(address.slice(address.lastIndexOf(':')+1)):25565;if(port<1||port>65535)throw new Error('Minecraft server port must be between 1 and 65535.');const websiteUrl=$('#partnerWebsite').value.trim();if(websiteUrl&&!/^https:\/\//i.test(websiteUrl))throw new Error('Website URL must start with https://');const existing=editingPartnerIndex>=0?config.partnerServers[editingPartnerIndex]:null;const addressUnchanged=existing?.address===address;return{id:existing?.id||'server-'+Date.now(),name:$('#partnerName').value.trim(),address,description:$('#partnerDescription').value.trim(),version:$('#partnerVersion').value.trim()||'Any version',badge:$('#partnerBadge').value.trim()||'PARTNER',iconUrl:addressUnchanged?existing.iconUrl||'':'',iconForAddress:addressUnchanged?existing.iconForAddress||'':'',autoProfile:true,websiteUrl,enabled:$('#partnerEnabled').checked}}
+function savePartnerDraft(){try{const partner=readPartnerDraft();const wasEditing=editingPartnerIndex>=0;if(wasEditing)config.partnerServers[editingPartnerIndex]=partner;else config.partnerServers.push(partner);resetPartnerEditor();renderPartnerCards();setMessage(wasEditing?'Server box updated. Press Publish to send the changes.':'Server added below. Add another one or press Publish launcher changes.')}catch(error){setMessage(error.message,true)}}
+function editPartner(index){const server=config.partnerServers[index];if(!server)return;editingPartnerIndex=index;$('#partnerAddress').value=server.address||'';$('#partnerName').value=server.name||'';$('#partnerBadge').value=server.badge||'PARTNER';$('#partnerWebsite').value=server.websiteUrl||'';$('#partnerVersion').value=server.version==='Any version'?'':server.version||'';$('#partnerDescription').value=server.description||'';$('#partnerEnabled').checked=server.enabled!==false;$('#partnerEditorTitle').textContent='Edit partner server';$('#savePartnerButton').textContent='Save server';$('#cancelPartnerEditButton').hidden=false;$('#partnerAddress').focus();window.scrollTo({top:0,behavior:'smooth'})}
+function resetPartnerEditor(){editingPartnerIndex=-1;$('#partnerAddress').value='';$('#partnerName').value='';$('#partnerBadge').value='PARTNER';$('#partnerWebsite').value='';$('#partnerVersion').value='';$('#partnerDescription').value='';$('#partnerEnabled').checked=true;$('#partnerEditorTitle').textContent='Add partner server';$('#savePartnerButton').textContent='+ Add server';$('#cancelPartnerEditButton').hidden=true}
+function removePartner(index){config.partnerServers.splice(index,1);if(editingPartnerIndex===index)resetPartnerEditor();renderPartnerCards();setMessage('Server removed from the draft. Press Publish to apply the removal.')}
+function renderPartnerCards(){const host=$('#partnerList');$('#partnerCount').textContent=`${config.partnerServers.length} server${config.partnerServers.length===1?'':'s'}`;if(!config.partnerServers.length){host.innerHTML='<div class="empty">No servers added yet. Fill the form above and press Add server.</div>';return}host.innerHTML=config.partnerServers.map((server,index)=>`<article class="server-card"><div class="server-card-main"><div class="server-avatar">${server.iconUrl?`<img src="${attribute(server.iconUrl)}" alt="">`:'MC'}</div><div class="server-title"><strong>${escapeHtml(server.name||server.address)}</strong><span>${escapeHtml(server.address)}</span></div><div class="server-actions"><button class="secondary" data-edit-partner="${index}">Edit</button><button class="danger" data-remove-partner="${index}">Remove</button></div></div><div class="server-meta"><span class="pill">${escapeHtml(server.badge||'PARTNER')}</span><span class="pill">${escapeHtml(server.version||'Any version')}</span>${server.enabled===false?'<span class="pill">Hidden</span>':'<span class="pill">Visible</span>'}</div>${server.description?`<div class="server-description">${escapeHtml(server.description)}</div>`:''}</article>`).join('');for(const button of host.querySelectorAll('[data-edit-partner]'))button.onclick=()=>editPartner(Number(button.dataset.editPartner));for(const button of host.querySelectorAll('[data-remove-partner]'))button.onclick=()=>removePartner(Number(button.dataset.removePartner))}
+
+async function publishConfig(){syncConfig();if(config.forceUpdate&&!config.updateUrl)return setMessage('Force update requires an HTTPS update URL.',true);setBusy(true);setMessage('Publishing launcher changes...');try{const response=await adminFetch('/admin/config',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(config)});const result=await response.json();if(!response.ok)throw new Error(result.error||'Publish failed.');config=result;bindConfig();const local=['127.0.0.1','localhost'].includes(location.hostname);setMessage(local?'Saved locally. Host this panel at launcher.unitedbangla.top before the public launcher can receive it.':'Published. Launchers will receive these changes on next open.')}catch(error){if(!(error instanceof AuthenticationRequired))setMessage(error.message,true)}finally{setBusy(false)}}
 function syncConfig(){for(const key of ['currentVersion','latestVersion','updateTitle','updateMessage','updateUrl','releaseNotesUrl'])config[key]=$('#'+key).value.trim();config.forceUpdate=$('#forceUpdate').checked;config.schemaVersion=1;config.assets={};for(const [key] of assetFields){const value=$('#'+key).value.trim();if(value)config.assets[key]=value}}
 
-async function uploadAsset(input){const file=input.files?.[0];if(!file)return;setBusy(true);setMessage(`Uploading ${file.name}…`);try{const base64=await readAsDataUrl(file);const response=await fetch(apiUrl('/admin/upload'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:file.name,base64})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Upload failed.');setAsset(input.dataset.upload,result.url);setMessage('Upload complete. Press Publish to activate it.')}catch(error){setMessage(error.message,true)}finally{setBusy(false)}}
+async function uploadAsset(input){const file=input.files?.[0];if(!file)return;setBusy(true);setMessage(`Uploading ${file.name}...`);try{const base64=await readAsDataUrl(file);const response=await adminFetch('/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:file.name,base64})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Upload failed.');setAsset(input.dataset.upload,result.url);setMessage('Upload complete. Press Publish to activate it.')}catch(error){if(!(error instanceof AuthenticationRequired))setMessage(error.message,true)}finally{setBusy(false)}}
 function setAsset(key,value){$('#'+key).value=value;const preview=$('#'+key+'Preview');preview.src=value;preview.style.display=value?'block':'none'}
 
-function renderAnalytics(){const summary=analytics.summary||{};for(const key of ['totalUsers','onlineNow','active24h','active7d','totalSessions','totalGameLaunches'])$('#'+key).textContent=Number(summary[key]||0).toLocaleString();const recent=(analytics.users||[]).slice(0,8);$('#recentUsers').innerHTML=recent.length?recent.map(user=>`<tr><td>${userLabel(user)}</td><td><span class="pill">${escapeHtml(user.launcherVersion||'Unknown')}</span></td><td>${escapeHtml(user.os||'Unknown')}</td><td class="online">${relativeTime(user.lastSeen)}</td></tr>`).join(''):'<tr><td colspan="4" class="muted">No opted-in user activity yet.</td></tr>';const highest=Math.max(1,...(analytics.versions||[]).map(item=>item.count));$('#versionChart').innerHTML=(analytics.versions||[]).length?analytics.versions.map(item=>`<div class="version-row"><span>${escapeHtml(item.version)}</span><div class="bar"><i style="width:${item.count/highest*100}%"></i></div><b>${item.count}</b></div>`).join(''):'<div class="empty">No version data yet.</div>';renderAllUsers()}
-function renderAllUsers(){const query=$('#userSearch').value.trim().toLowerCase();const users=(analytics.users||[]).filter(user=>JSON.stringify(user).toLowerCase().includes(query));$('#allUsers').innerHTML=users.length?users.map(user=>`<tr><td>${userLabel(user)}<br><span class="muted">${escapeHtml(shortId(user.installId))}</span></td><td>${escapeHtml(user.accountType||'Anonymous')}</td><td>${escapeHtml(user.email||'Not available')}</td><td><span class="pill">${escapeHtml(user.launcherVersion||'Unknown')}</span></td><td>${escapeHtml(user.os||'Unknown')} / ${escapeHtml(user.architecture||'')}</td><td>${escapeHtml(user.locale||'Unknown')}</td><td>${escapeHtml(user.lastEvent||'—')}</td><td>${Number(user.sessions||0)}</td><td>${Number(user.gameLaunches||0)}</td><td>${formatDate(user.firstSeen)}</td><td class="online">${relativeTime(user.lastSeen)}</td></tr>`).join(''):'<tr><td colspan="11" class="muted">No matching opted-in users.</td></tr>'}
-function userLabel(user){return escapeHtml(user.displayName||'Anonymous user')}function shortId(value){const text=String(value||'');return text.length>13?text.slice(0,8)+'…'+text.slice(-4):text}function relativeTime(value){const seconds=Math.max(0,(Date.now()-Date.parse(value))/1000);if(seconds<60)return'Just now';if(seconds<3600)return Math.floor(seconds/60)+'m ago';if(seconds<86400)return Math.floor(seconds/3600)+'h ago';return Math.floor(seconds/86400)+'d ago'}function formatDate(value){const date=new Date(value);return Number.isNaN(date.valueOf())?'—':date.toLocaleDateString()}
+function renderAnalytics(){const summary=analytics.summary||{};for(const key of ['totalUsers','onlineNow','active24h','active7d','totalSessions','totalGameLaunches'])$('#'+key).textContent=Number(summary[key]||0).toLocaleString();const recent=(analytics.users||[]).slice(0,8);$('#recentUsers').innerHTML=recent.length?recent.map(user=>`<tr><td>${escapeHtml(user.displayName||'Anonymous user')}</td><td><span class="pill">${escapeHtml(user.launcherVersion||'Unknown')}</span></td><td>${escapeHtml(user.os||'Unknown')}</td><td class="online">${relativeTime(user.lastSeen)}</td></tr>`).join(''):'<tr><td colspan="4" class="muted">No anonymous launcher activity yet.</td></tr>';const highest=Math.max(1,...(analytics.versions||[]).map(item=>item.count));$('#versionChart').innerHTML=(analytics.versions||[]).length?analytics.versions.map(item=>`<div class="version-row"><span>${escapeHtml(item.version)}</span><div class="bar"><i style="width:${item.count/highest*100}%"></i></div><b>${item.count}</b></div>`).join(''):'<div class="empty">No version data yet.</div>'}
+
+function renderAdministrators(){const host=$('#administratorList');host.innerHTML=administrators.length?administrators.map(item=>`<tr><td><span class="pill">${escapeHtml(item.username)}</span>${item.isPrimary?' <span class="pill online">Main admin</span>':''}</td><td>${formatDate(item.createdAt)}</td><td>${item.isPrimary?'<span class="muted">Protected</span>':`<button class="danger" data-remove-administrator="${attribute(item.id)}">Remove</button>`}</td></tr>`).join(''):'<tr><td colspan="3" class="muted">No administrator accounts found.</td></tr>';for(const button of host.querySelectorAll('[data-remove-administrator]'))button.onclick=()=>removeAdministrator(button.dataset.removeAdministrator)}
+async function addAdministrator(){const username=$('#administratorUsername').value.trim();const password=$('#administratorPassword').value;if(password.length<6)return setMessage('Administrator password must contain at least 6 characters.',true);const button=$('#addAdministratorButton');button.disabled=true;setMessage('Adding administrator...');try{const response=await adminFetch('/admin/administrators',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Could not add administrator.');administrators=result.administrators||[];$('#administratorUsername').value='';$('#administratorPassword').value='';renderAdministrators();setMessage(`Administrator ${username} can now sign in.`)}catch(error){if(!(error instanceof AuthenticationRequired))setMessage(error.message,true)}finally{button.disabled=false}}
+async function removeAdministrator(id){if(!confirm('Remove this administrator account?'))return;setMessage('Removing administrator...');try{const response=await adminFetch('/admin/administrators/'+encodeURIComponent(id),{method:'DELETE'});const result=await response.json();if(!response.ok)throw new Error(result.error||'Could not remove administrator.');administrators=result.administrators||[];renderAdministrators();setMessage('Administrator access removed.')}catch(error){if(!(error instanceof AuthenticationRequired))setMessage(error.message,true)}}
+
+function relativeTime(value){const seconds=Math.max(0,(Date.now()-Date.parse(value))/1000);if(seconds<60)return'Just now';if(seconds<3600)return Math.floor(seconds/60)+'m ago';if(seconds<86400)return Math.floor(seconds/3600)+'h ago';return Math.floor(seconds/86400)+'d ago'}
+function formatDate(value){const date=new Date(value);return Number.isNaN(date.valueOf())?'Unknown':date.toLocaleString()}
 function apiUrl(path){return new URL(path,location.origin).href}function readAsDataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read the file.'));reader.readAsDataURL(file)})}function setBusy(value){publishButton.disabled=value}function setMessage(value,error=false){message.textContent=value;message.classList.toggle('error',error)}function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}function attribute(value){return escapeHtml(value)}
 </script>
 </body>

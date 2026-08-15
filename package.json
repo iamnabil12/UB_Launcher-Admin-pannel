@@ -6,7 +6,7 @@
   "description": "Remote update and branding control panel for UB Launcher",
   "scripts": {
     "start": "node --env-file=.env server.mjs",
-    "check": "node --check server.mjs",
+    "check": "node --check server.mjs && node --check minecraft-dns.mjs",
     "test": "node --test test/server.test.mjs"
   },
   "engines": {
