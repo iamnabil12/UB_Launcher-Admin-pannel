@@ -55,7 +55,7 @@ For Cloudflare, create this DNS record first:
 ```text
 Type: A
 Name: launcher
-IPv4: 62.72.57.85
+IPv4: 213.35.106.78
 Proxy: DNS only while issuing the certificate
 ```
 

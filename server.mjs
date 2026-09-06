@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, rename, stat, unlink, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import { dirname, extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,9 +19,11 @@ const publicBaseUrl = normalizeBaseUrl(
 );
 const dataDirectory = resolveDataDirectory(process.env.UB_ADMIN_DATA_DIR);
 const assetDirectory = join(dataDirectory, 'assets');
+const backupDirectory = join(dataDirectory, 'backups');
 const configPath = join(dataDirectory, 'config.json');
 const analyticsPath = join(dataDirectory, 'users.json');
 const administratorsPath = join(dataDirectory, 'administrators.json');
+const auditPath = join(dataDirectory, 'audit.json');
 const adminHtmlPath = join(projectDirectory, 'public', 'admin.html');
 const maximumRequestBytes = 8 * 1024 * 1024;
 const maximumLoginRequestBytes = 4 * 1024;
@@ -63,6 +65,7 @@ const defaultConfig = {
 };
 
 await mkdir(assetDirectory, { recursive: true });
+await mkdir(backupDirectory, { recursive: true });
 if (!existsSync(configPath)) await saveConfig(defaultConfig);
 await initializeAdministrators();
 const adminHtml = await readFile(adminHtmlPath, 'utf8');
@@ -142,6 +145,10 @@ const server = createServer(async (request, response) => {
       return sendJson(response, 200, await getAnalyticsDashboard(), { 'Cache-Control': 'no-store' });
     }
 
+    if (request.method === 'GET' && url.pathname === '/admin/audit') {
+      return sendJson(response, 200, { entries: await loadAuditEntries() }, { 'Cache-Control': 'no-store' });
+    }
+
     if (request.method === 'GET' && url.pathname === '/admin/administrators') {
       return sendJson(response, 200, {
         administrators: administratorStore.administrators.map(toPublicAdministrator)
@@ -150,6 +157,7 @@ const server = createServer(async (request, response) => {
 
     if (request.method === 'POST' && url.pathname === '/admin/administrators') {
       const created = await addAdministrator(await readJson(request, maximumAdministratorRequestBytes));
+      await recordAudit('administrator.add', administrator.username, `Added administrator ${created.username}.`);
       return sendJson(response, 201, {
         created: toPublicAdministrator(created),
         administrators: administratorStore.administrators.map(toPublicAdministrator)
@@ -159,6 +167,7 @@ const server = createServer(async (request, response) => {
     const deleteAdministratorMatch = /^\/admin\/administrators\/([a-zA-Z0-9_-]{8,80})$/.exec(url.pathname);
     if (request.method === 'DELETE' && deleteAdministratorMatch) {
       await removeAdministrator(deleteAdministratorMatch[1], administrator.id);
+      await recordAudit('administrator.remove', administrator.username, 'Removed an administrator account.');
       return sendJson(response, 200, {
         administrators: administratorStore.administrators.map(toPublicAdministrator)
       }, { 'Cache-Control': 'no-store' });
@@ -183,6 +192,7 @@ const server = createServer(async (request, response) => {
 
       administrator.passwordHash = hashPassword(newPassword);
       await saveAdministrators();
+      await recordAudit('administrator.password', administrator.username, 'Administrator password changed.');
       return sendJson(response, 200, { message: 'Password changed successfully.' }, { 'Cache-Control': 'no-store' });
     }
 
@@ -191,12 +201,14 @@ const server = createServer(async (request, response) => {
       const configuration = sanitizeConfig(await readJson(request, maximumConfigRequestBytes));
       await enrichPartnerProfiles(configuration.partnerServers);
       await saveConfig(configuration);
+      await recordAudit('config.publish', administrator.username, 'Launcher configuration published.');
       return sendJson(response, 200, configuration, { 'Cache-Control': 'no-store' });
     }
 
     if (request.method === 'POST' && url.pathname === '/admin/upload') {
       const uploaded = await readJson(request);
       const savedUrl = await saveUploadedAsset(uploaded);
+      await recordAudit('asset.upload', administrator.username, `Uploaded ${safeFilename(uploaded?.name) || 'asset'}.`);
       return sendJson(response, 200, { url: savedUrl }, { 'Cache-Control': 'no-store' });
     }
 
@@ -556,9 +568,41 @@ async function loadConfig() {
 }
 
 async function saveConfig(value) {
+  if (existsSync(configPath)) {
+    const backupName = `config-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    await copyFile(configPath, join(backupDirectory, backupName));
+    const backups = (await readdir(backupDirectory))
+      .filter(name => name.startsWith('config-') && name.endsWith('.json'))
+      .sort()
+      .reverse();
+    for (const stale of backups.slice(20)) await unlink(join(backupDirectory, stale)).catch(() => {});
+  }
   const temporaryPath = `${configPath}.tmp`;
   await writeFile(temporaryPath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
   await rename(temporaryPath, configPath);
+}
+
+async function recordAudit(action, actor, details) {
+  const entries = await loadAuditEntries();
+  entries.unshift({
+    id: `audit-${Date.now()}-${randomBytes(4).toString('hex')}`,
+    action: text(action, 64, 'system'),
+    actor: text(actor, 80, 'system'),
+    details: text(details, 240, ''),
+    createdAt: new Date().toISOString()
+  });
+  const temporaryPath = `${auditPath}.tmp`;
+  await writeFile(temporaryPath, `${JSON.stringify({ entries: entries.slice(0, 200) }, null, 2)}\n`, 'utf8');
+  await rename(temporaryPath, auditPath);
+}
+
+async function loadAuditEntries() {
+  try {
+    const value = JSON.parse(await readFile(auditPath, 'utf8'));
+    return Array.isArray(value?.entries) ? value.entries.slice(0, 200) : [];
+  } catch {
+    return [];
+  }
 }
 
 function sanitizeConfig(value) {
